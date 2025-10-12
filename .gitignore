@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+*.pyo
+*.pyd
+
+# IDE/project files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Game data
+roman_sudoku_save.json
+
+# Fonts
+src/assets/fonts/NotoSans-Regular.ttf
