@@ -1,33 +1,80 @@
 import os
 import time
+import math
 import pygame
 from .board import SudokuBoard, sample_puzzle
 from .romannum import int_to_roman, roman_to_int, normalize_roman_input
-from .ui import (WINDOW_WIDTH, WINDOW_HEIGHT, TOP_BAR, MARGIN, draw_text,
-                 draw_grid, draw_rules, CELL_SIZE, YELLOW, BLACK, WHITE)
+from .ui import (WINDOW_WIDTH, WINDOW_HEIGHT, TOP_BAR, MARGIN, draw_animated_laurel, draw_menu, draw_text,
+                 draw_grid, draw_rules, CELL_SIZE, YELLOW, BLACK, WHITE, draw_title)
 
 ASSETS_FONT_PATH = os.path.join(os.path.dirname(__file__), "assets", "fonts", "NotoSans-Regular.ttf")
+ASSETS_TITLE_FONT_PATH = os.path.join(os.path.dirname(__file__), "assets", "fonts", "NotoSans-Regular.ttf")
+ASSETS_EAGLE_PATH = os.path.join(os.path.dirname(__file__), "assets", "images", "eagle.png")
 
-def load_font(size):
+def load_font(size, path=ASSETS_FONT_PATH):
     try:
-        return pygame.font.Font(ASSETS_FONT_PATH, size)
+        return pygame.font.Font(path, size)
     except Exception:
-        return pygame.font.SysFont("arial", size)
+        return pygame.font.SysFont("serif", size)
+
+def load_title_font(size):
+    try:
+        return pygame.font.Font(ASSETS_TITLE_FONT_PATH, size)
+    except Exception:
+        return pygame.font.SysFont("serif", size, bold=True)
+
+def load_eagle():
+    try:
+        img = pygame.image.load(ASSETS_EAGLE_PATH)
+        return pygame.transform.scale(img, (48, 48))
+    except Exception:
+        return None
+
+def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img=None):
+    clock = pygame.time.Clock()
+    while True:
+        new_rect, resume_rect = draw_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit(); exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if new_rect.collidepoint(event.pos):
+                    return "new"
+                if resume_rect and resume_rect.collidepoint(event.pos):
+                    return "resume"
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_n:
+                    return "new"
+                if show_resume and event.key == pygame.K_r:
+                    return "resume"
+        clock.tick(30)
 
 def main():
     pygame.init()
-    pygame.display.set_caption("Roman Sudoku")
+    info = pygame.display.Info()
+    WINDOW_WIDTH, WINDOW_HEIGHT = info.current_w, info.current_h
+    pygame.display.set_caption("Aenigma Numerorum Caesaris")
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     font_small = load_font(18)
     font_cell = load_font(30)
+    font_title = load_title_font(48)  # Large, bold Roman font
+    font_desc = load_font(20)
+    font_button = load_title_font(32)
+    eagle_img = load_eagle()
     clock = pygame.time.Clock()
 
-    loaded = SudokuBoard.load_if_exists()
-    if loaded is None:
+    title = "Aenigma Numerorum Caesaris"
+    desc = "A Roman Sudoku: Fill the grid with I–IX, following classic Sudoku rules. Glory to the Empire!"
+
+    # Show start menu
+    show_resume = SudokuBoard.load_if_exists() is not None
+    choice = start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img)
+    if choice == "resume":
+        board = SudokuBoard.load_if_exists()
+    else:
         puzzle, solution = sample_puzzle()
         board = SudokuBoard(puzzle, solution)
-    else:
-        board = loaded
 
     selected = None
     running = True
@@ -37,7 +84,9 @@ def main():
     pause_started = None
     roman_buffer = ""  # collects typed I/V/X before committing
 
+    frame = 0
     while running:
+        frame += 1
         dt = clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -57,7 +106,14 @@ def main():
                             paused_accum += time.time() - pause_started
                             pause_started = None
                 elif event.key == pygame.K_r:
-                    board.randomize_symbol_perm()
+                    # Start a new game with a new puzzle and solution
+                    puzzle, solution = sample_puzzle()
+                    board = SudokuBoard(puzzle, solution)
+                    selected = None
+                    start_time = time.time()
+                    paused_accum = 0.0
+                    pause_started = None
+                    roman_buffer = ""
                 elif event.key == pygame.K_h:
                     hint = board.get_hint_cell()
                     if hint and not paused:
@@ -126,25 +182,27 @@ def main():
 
         # Drawing
         screen.fill(WHITE)
+        # Title and description with laurel, SPQR, eagle
+        draw_animated_laurel(screen, frame)
+        draw_title(screen, font_title, font_desc, title, desc, eagle_img)
         # Elapsed time
         if paused:
             elapsed = int((pause_started - start_time - paused_accum)) if pause_started else int((time.time() - start_time - paused_accum))
         else:
             elapsed = int(time.time() - start_time - paused_accum)
-
         # Rules and status
-        draw_rules(screen, font_small, elapsed, paused)
+        rules_y = 120
+        draw_rules(screen, font_small, elapsed, paused, y_offset=rules_y)
         # Grid and cells
         draw_grid(screen, font_cell, board, selected)
-
         # Win state
         if board.is_complete():
-            msg = "Completed! Press R to reshuffle symbols or Q to quit."
-            draw_text(screen, msg, font_small, BLACK, (MARGIN, 75))
-
+            msg = "Completed! Press R for a new puzzle or Q to quit."
+            draw_text(screen, msg, font_small, BLACK, (MARGIN, rules_y + 85))
         pygame.display.flip()
 
     pygame.quit()
 
 if __name__ == "__main__":
+
     main()
