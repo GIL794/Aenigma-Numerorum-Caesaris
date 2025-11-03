@@ -1,3 +1,5 @@
+# IT DOES NOT WORK AS EXPECTED YET, MOST UPDATED VERSION IS ON MY LOCAL MACHINE, STILL FIXING
+
 # Aenigma-Numerorum-Caesaris
 Ludus Mentis ad Gloriam Imperii﻿
 
