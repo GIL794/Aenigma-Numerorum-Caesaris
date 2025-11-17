@@ -78,7 +78,7 @@ def draw_rules(surface, font_small, elapsed_seconds: int, paused: bool, y_offset
     y = y_offset + 4
     for line in lines:
         draw_text(surface, line, font_small, BLACK, (WINDOW_WIDTH // 2 - font_small.size(line)[0] // 2, y))
-        y += font_small.get_height() + 8 
+        y += font_small.get_height() + 8
 
 def draw_grid(surface, font_cell, board, selected: Tuple[int, int] | None):
     offset_x = MARGIN
