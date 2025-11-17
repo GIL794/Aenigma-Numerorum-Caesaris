@@ -68,7 +68,7 @@ def draw_title(surface, font_title, font_desc, title: str, desc: str, eagle_img=
 def draw_rules(surface, font_small, elapsed_seconds: int, paused: bool, y_offset: int = 120):
     x_rules = MARGIN
     rule_text = "Rules: Fill 1–9 uniquely in each row, column, and 3×3 box. Use Roman numerals I–IX."
-    hint_text = "Controls: Click cell; 1–9 or Roman I/V/X; H=Hint, R=Reshuffle, P=Pause, Q=Quit, Del=Clear"
+    hint_text = "Controls: Click cell; 1–9 or Roman I/V/X; H=Hint, R=New Game, P=Pause, Q=Quit, Del=Clear"
     mins, secs = divmod(elapsed_seconds, 60)
     status_text = f"Time: {mins:02d}:{secs:02d}  {'[PAUSED]' if paused else ''}"
     lines = [rule_text, hint_text, status_text]
@@ -78,7 +78,7 @@ def draw_rules(surface, font_small, elapsed_seconds: int, paused: bool, y_offset
     y = y_offset + 4
     for line in lines:
         draw_text(surface, line, font_small, BLACK, (WINDOW_WIDTH // 2 - font_small.size(line)[0] // 2, y))
-        y += font_small.get_height() + 8 
+        y += font_small.get_height() + 8
 
 def draw_grid(surface, font_cell, board, selected: Tuple[int, int] | None):
     offset_x = MARGIN
@@ -241,12 +241,12 @@ def draw_instructions_button(surface, font, rect, hover=False):
 
 def get_rules_text():
     rule_text = "Regulae: Omnem numerum Romanum I–IX in singulis ordinibus, columnis, quadratis pone."
-    hint_text = "Claves: Cellulam selige; 1–9 aut Romanum I/V/X; H=Auxilium, R=Permutatio, P=Intermissio, Q=Exire, Del=Dele."
+    hint_text = "Claves: Cellulam selige; 1–9 aut Romanum I/V/X; H=Auxilium, R=Novum Ludum, P=Intermissio, Q=Exire, Del=Dele."
     return [rule_text, hint_text]
 
 def get_rules_text_english():
     rule_text_en = "Rules: Fill each row, column, and 3x3 box with Roman numerals I–IX."
-    hint_text_en = "Controls: Select a cell; enter 1–9 or Roman I/V/X; H=Hint, R=Reshuffle, P=Pause, Q=Quit, Del=Clear."
+    hint_text_en = "Controls: Select a cell; enter 1–9 or Roman I/V/X; H=Hint, R=New Game, P=Pause, Q=Quit, Del=Clear."
     return [rule_text_en, hint_text_en]
 
 def draw_instructions_dropdown(surface, font, rect):

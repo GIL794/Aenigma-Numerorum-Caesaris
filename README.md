@@ -1,11 +1,9 @@
-# IT DOES NOT WORK AS EXPECTED YET, MOST UPDATED VERSION IS ON MY LOCAL MACHINE, STILL FIXING
-
 # Aenigma-Numerorum-Caesaris
 Ludus Mentis ad Gloriam Imperii﻿
 
 # Roman Numeral Sudoku-Alike (Local Pygame)
 
-A local Sudoku-style game using Roman numerals I–IX. Features play, pause/resume, quit, reshuffle symbols, hints, and on-screen rules.
+A local Sudoku-style game using Roman numerals I–IX. Features play, pause/resume, quit, new game, hints, and on-screen rules.
 
 ## Install
 - Python 3.11
@@ -17,4 +15,4 @@ A local Sudoku-style game using Roman numerals I–IX. Features play, pause/resu
 ## Controls
 - Click a cell to select
 - Type 1–9 or Roman I/V/X to enter; Backspace/Delete to clear
-- H: Hint; R: Reshuffle symbols; P: Pause/Resume; Q: Quit
+- H: Hint; R: New Game; P: Pause/Resume; Q: Quit
