@@ -52,8 +52,6 @@ def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_
 
 def main():
     pygame.init()
-    info = pygame.display.Info()
-    WINDOW_WIDTH, WINDOW_HEIGHT = info.current_w, info.current_h
     pygame.display.set_caption("Aenigma Numerorum Caesaris")
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     font_small = load_font(18)
