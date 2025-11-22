@@ -15,23 +15,37 @@ ASSETS_EAGLE_PATH = os.path.join(os.path.dirname(__file__), "assets", "images", 
 def load_font(size, path=ASSETS_FONT_PATH):
     try:
         return pygame.font.Font(path, size)
-    except Exception:
+    except (FileNotFoundError, pygame.error):
         return pygame.font.SysFont("serif", size)
 
 def load_title_font(size):
     try:
         return pygame.font.Font(ASSETS_TITLE_FONT_PATH, size)
-    except Exception:
+    except (FileNotFoundError, pygame.error):
         return pygame.font.SysFont("serif", size, bold=True)
 
 def load_eagle():
     try:
         img = pygame.image.load(ASSETS_EAGLE_PATH)
         return pygame.transform.scale(img, (48, 48))
-    except Exception:
+    except (FileNotFoundError, pygame.error):
         return None
 
 def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img=None):
+    """Display the start menu and handle user input.
+    
+    Args:
+        screen: Pygame display surface
+        font_title: Font for title text
+        font_button: Font for button text
+        title: Game title string
+        desc: Game description string
+        show_resume: Whether to show the resume button
+        eagle_img: Optional eagle icon image
+        
+    Returns:
+        str: "new" for new game or "resume" to resume saved game
+    """
     clock = pygame.time.Clock()
     frame = 0
     while True:
@@ -55,6 +69,11 @@ def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_
         clock.tick(30)
 
 def main():
+    """Main game loop for Aenigma Numerorum Caesaris (Roman Numeral Sudoku).
+    
+    Initializes pygame, displays the start menu, and runs the game loop with
+    controls for pause, resume, new game, hints, and cell selection/input.
+    """
     try:
         pygame.init()
         pygame.display.set_caption("Aenigma Numerorum Caesaris")

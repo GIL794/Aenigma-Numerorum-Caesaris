@@ -22,5 +22,8 @@ Thumbs.db
 # Game data
 roman_sudoku_save.json
 
-# Fonts
+# Fonts (large binary file, tracked via git-lfs or separate download)
 src/assets/fonts/NotoSans-Regular.ttf
+
+# Pytest cache
+.pytest_cache/

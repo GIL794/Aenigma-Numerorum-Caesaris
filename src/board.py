@@ -6,6 +6,16 @@ from typing import List, Optional, Tuple
 SAVE_FILE = "roman_sudoku_save.json"
 
 class SudokuBoard:
+    """Represents a Sudoku board with puzzle, solution, and user input.
+    
+    Attributes:
+        puzzle: Initial puzzle with 0 for empty cells
+        solution: Complete solution grid
+        user: Current user input state
+        fixed: Boolean grid indicating which cells are pre-filled
+        symbol_perm: Permutation for symbol display mapping
+    """
+    
     def __init__(self, puzzle: List[List[int]], solution: List[List[int]]):
         self.puzzle = puzzle  # 0 for empty
         self.solution = solution
@@ -121,6 +131,12 @@ class SudokuBoard:
         return None
 
 def sample_puzzle() -> Tuple[List[List[int]], List[List[int]]]:
+    """Return a sample Sudoku puzzle and its solution.
+    
+    Returns:
+        Tuple containing (puzzle, solution) where both are 9x9 grids.
+        Empty cells in puzzle are represented as 0.
+    """
     # A valid Sudoku puzzle with a unique solution (0 = empty).
     # Puzzle and solution pair adapted from a common benchmark.
     puzzle = [
