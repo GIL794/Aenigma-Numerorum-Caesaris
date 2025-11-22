@@ -41,15 +41,14 @@ def draw_text(surface, text, font, color, pos, shadow=False):
 def draw_title(surface, font_title, font_desc, title: str, desc: str, eagle_img=None):
     # Imperial purple background
     pygame.draw.rect(surface, IMPERIAL_PURPLE, (0, 0, WINDOW_WIDTH, TOP_BAR))
-    # Laurel wreath (static, no animation in title bar)
-    for i in range(10):
-        pygame.draw.ellipse(surface, GOLD, (MARGIN + i*32, 8, 26, 16))
-        pygame.draw.ellipse(surface, GOLD, (WINDOW_WIDTH - MARGIN - (i+1)*32, 8, 26, 16))
+    # Laurel wreath drawn separately by draw_animated_laurel for animation
     # SPQR banner
     banner_rect = pygame.Rect(WINDOW_WIDTH//2 - 60, 32, 120, 24)
     pygame.draw.rect(surface, GOLD, banner_rect, border_radius=8)
     spqr_font = font_desc
-    draw_text(surface, "SPQR", spqr_font, IMPERIAL_PURPLE, (banner_rect.x+36, banner_rect.y+2))
+    spqr_text = "SPQR"
+    spqr_x = banner_rect.x + banner_rect.width//2 - spqr_font.size(spqr_text)[0]//2
+    draw_text(surface, spqr_text, spqr_font, IMPERIAL_PURPLE, (spqr_x, banner_rect.y+2))
     # Eagle icon (optional) - top right corner
     if eagle_img:
         surface.blit(eagle_img, (WINDOW_WIDTH - MARGIN - 48, 6))

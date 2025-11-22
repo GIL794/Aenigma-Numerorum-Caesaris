@@ -207,9 +207,10 @@ def main():
 
         # Drawing
         screen.fill(WHITE)
-        # Title and description with laurel, SPQR, eagle
-        draw_animated_laurel(screen, frame)
+        # Title and description with SPQR, eagle
         draw_title(screen, font_title, font_desc, title, desc, eagle_img)
+        # Animated laurel drawn on top of title bar
+        draw_animated_laurel(screen, frame)
         # Elapsed time
         if paused:
             elapsed = int((pause_started - start_time - paused_accum)) if pause_started else int((time.time() - start_time - paused_accum))
