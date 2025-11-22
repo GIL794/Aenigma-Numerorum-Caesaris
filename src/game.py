@@ -1,10 +1,11 @@
 import os
+import sys
 import time
 import math
 import pygame
 from .board import SudokuBoard, sample_puzzle
 from .romannum import int_to_roman, roman_to_int, normalize_roman_input
-from .ui import (WINDOW_WIDTH, WINDOW_HEIGHT, TOP_BAR, MARGIN, draw_animated_laurel, draw_menu, draw_text,
+from .ui import (WINDOW_WIDTH, WINDOW_HEIGHT, TOP_BAR, RULES_HEIGHT, MARGIN, draw_animated_laurel, draw_menu, draw_text,
                  draw_grid, draw_rules, CELL_SIZE, YELLOW, BLACK, WHITE, draw_title)
 
 ASSETS_FONT_PATH = os.path.join(os.path.dirname(__file__), "assets", "fonts", "NotoSans-Regular.ttf")
@@ -32,12 +33,15 @@ def load_eagle():
 
 def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img=None):
     clock = pygame.time.Clock()
+    frame = 0
     while True:
-        new_rect, resume_rect = draw_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img)
+        frame += 1
+        new_rect, resume_rect = draw_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img, frame)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit(); exit()
+                pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if new_rect.collidepoint(event.pos):
                     return "new"
@@ -51,9 +55,13 @@ def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_
         clock.tick(30)
 
 def main():
-    pygame.init()
-    pygame.display.set_caption("Aenigma Numerorum Caesaris")
-    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    try:
+        pygame.init()
+        pygame.display.set_caption("Aenigma Numerorum Caesaris")
+        screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    except pygame.error as e:
+        print(f"Failed to initialize pygame: {e}")
+        sys.exit(1)
     font_small = load_font(18)
     font_cell = load_font(30)
     font_title = load_title_font(48)  # Large, bold Roman font
@@ -171,7 +179,7 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 x, y = event.pos
                 grid_x0 = MARGIN
-                grid_y0 = TOP_BAR
+                grid_y0 = TOP_BAR + RULES_HEIGHT
                 if grid_x0 <= x <= grid_x0 + 9 * CELL_SIZE and grid_y0 <= y <= grid_y0 + 9 * CELL_SIZE:
                     c = (x - grid_x0) // CELL_SIZE
                     r = (y - grid_y0) // CELL_SIZE
@@ -189,14 +197,15 @@ def main():
         else:
             elapsed = int(time.time() - start_time - paused_accum)
         # Rules and status
-        rules_y = 120
+        rules_y = TOP_BAR
         draw_rules(screen, font_small, elapsed, paused, y_offset=rules_y)
         # Grid and cells
         draw_grid(screen, font_cell, board, selected)
         # Win state
         if board.is_complete():
             msg = "Completed! Press R for a new puzzle or Q to quit."
-            draw_text(screen, msg, font_small, BLACK, (MARGIN, rules_y + 85))
+            win_y = TOP_BAR + RULES_HEIGHT + 9 * CELL_SIZE + 10
+            draw_text(screen, msg, font_small, BLACK, (MARGIN, win_y))
         pygame.display.flip()
 
     pygame.quit()

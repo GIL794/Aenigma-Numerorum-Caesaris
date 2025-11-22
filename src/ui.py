@@ -26,8 +26,10 @@ MARGIN = 24  # Padding around grid and UI elements
 WINDOW_SIZE = GRID_SIZE + 2 * MARGIN  # MARGIN can be 20-30 for padding
 
 WINDOW_WIDTH = WINDOW_SIZE
-WINDOW_HEIGHT = WINDOW_SIZE
-TOP_BAR = 60  # Smaller top bar for compact layout
+TOP_BAR = 60  # Top bar for title and decorative elements
+RULES_HEIGHT = 90  # Height for rules section
+BOTTOM_MARGIN = 20  # Bottom padding
+WINDOW_HEIGHT = TOP_BAR + RULES_HEIGHT + GRID_SIZE + BOTTOM_MARGIN  # Total height to fit all elements
 
 def draw_text(surface, text, font, color, pos, shadow=False):
     if shadow:
@@ -38,32 +40,19 @@ def draw_text(surface, text, font, color, pos, shadow=False):
 
 def draw_title(surface, font_title, font_desc, title: str, desc: str, eagle_img=None):
     # Imperial purple background
-    pygame.draw.rect(surface, IMPERIAL_PURPLE, (0, 0, WINDOW_WIDTH, TOP_BAR - 10))
-    # Laurel wreath
+    pygame.draw.rect(surface, IMPERIAL_PURPLE, (0, 0, WINDOW_WIDTH, TOP_BAR))
+    # Laurel wreath (static, no animation in title bar)
     for i in range(10):
-        pygame.draw.ellipse(surface, GOLD, (MARGIN + i*32, 22, 26, 16))
-        pygame.draw.ellipse(surface, GOLD, (WINDOW_WIDTH - MARGIN - (i+1)*32, 22, 26, 16))
+        pygame.draw.ellipse(surface, GOLD, (MARGIN + i*32, 8, 26, 16))
+        pygame.draw.ellipse(surface, GOLD, (WINDOW_WIDTH - MARGIN - (i+1)*32, 8, 26, 16))
     # SPQR banner
-    banner_rect = pygame.Rect(WINDOW_WIDTH//2 - 60, 22, 120, 32)
+    banner_rect = pygame.Rect(WINDOW_WIDTH//2 - 60, 32, 120, 24)
     pygame.draw.rect(surface, GOLD, banner_rect, border_radius=8)
     spqr_font = font_desc
-    draw_text(surface, "SPQR", spqr_font, IMPERIAL_PURPLE, (banner_rect.x+24, banner_rect.y+2))
-    # Eagle icon (optional)
+    draw_text(surface, "SPQR", spqr_font, IMPERIAL_PURPLE, (banner_rect.x+36, banner_rect.y+2))
+    # Eagle icon (optional) - top right corner
     if eagle_img:
-        surface.blit(eagle_img, (WINDOW_WIDTH - MARGIN - 60, 10))
-    # Title text with shadow
-    draw_text(surface, title, font_title, GOLD, (WINDOW_WIDTH // 2 - font_title.size(title)[0] // 2, 18), shadow=True)
-    # Description text (wrapped and centered)
-    desc_lines = wrap_text(desc, font_desc, WINDOW_WIDTH - 2 * MARGIN)
-    y = 70
-    for line in desc_lines:
-        draw_text(surface, line, font_desc, MARBLE, (WINDOW_WIDTH // 2 - font_desc.size(line)[0] // 2, y))
-        y += font_desc.get_height() + 8
-
-    welcome = "Salve, ingenium Romanum! Paratus es ad ludum numerorum?"
-    welcome_en = "Welcome, Roman mind! Are you ready for the numbers game?"
-    draw_text(surface, welcome, font_desc, GOLD, (WINDOW_WIDTH // 2 - font_desc.size(welcome)[0] // 2, 8), shadow=True)
-    draw_text(surface, welcome_en, font_desc, GRAY, (WINDOW_WIDTH // 2 - font_desc.size(welcome_en)[0] // 2, 32))
+        surface.blit(eagle_img, (WINDOW_WIDTH - MARGIN - 48, 6))
 
 def draw_rules(surface, font_small, elapsed_seconds: int, paused: bool, y_offset: int = 120):
     x_rules = MARGIN
@@ -82,7 +71,7 @@ def draw_rules(surface, font_small, elapsed_seconds: int, paused: bool, y_offset
 
 def draw_grid(surface, font_cell, board, selected: Tuple[int, int] | None):
     offset_x = MARGIN
-    offset_y = TOP_BAR
+    offset_y = TOP_BAR + RULES_HEIGHT
     grid_w = CELL_SIZE * 9
     grid_h = CELL_SIZE * 9
 

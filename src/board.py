@@ -102,15 +102,22 @@ class SudokuBoard:
         return obj
 
     def save(self):
-        with open(SAVE_FILE, "w", encoding="utf-8") as f:
-            json.dump(self.serialize(), f)
+        try:
+            with open(SAVE_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.serialize(), f)
+        except (IOError, OSError) as e:
+            print(f"Warning: Failed to save game state: {e}")
 
     @staticmethod
     def load_if_exists() -> Optional["SudokuBoard"]:
         if os.path.exists(SAVE_FILE):
-            with open(SAVE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return SudokuBoard.deserialize(data)
+            try:
+                with open(SAVE_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return SudokuBoard.deserialize(data)
+            except (IOError, OSError, json.JSONDecodeError, KeyError) as e:
+                print(f"Warning: Failed to load saved game: {e}")
+                return None
         return None
 
 def sample_puzzle() -> Tuple[List[List[int]], List[List[int]]]:
