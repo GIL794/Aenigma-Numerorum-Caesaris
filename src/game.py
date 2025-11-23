@@ -1,10 +1,11 @@
 import os
+import sys
 import time
 import math
 import pygame
 from .board import SudokuBoard, sample_puzzle
 from .romannum import int_to_roman, roman_to_int, normalize_roman_input
-from .ui import (WINDOW_WIDTH, WINDOW_HEIGHT, TOP_BAR, MARGIN, draw_animated_laurel, draw_menu, draw_text,
+from .ui import (WINDOW_WIDTH, WINDOW_HEIGHT, TOP_BAR, RULES_HEIGHT, MARGIN, draw_animated_laurel, draw_menu, draw_text,
                  draw_grid, draw_rules, CELL_SIZE, YELLOW, BLACK, WHITE, draw_title)
 
 ASSETS_FONT_PATH = os.path.join(os.path.dirname(__file__), "assets", "fonts", "NotoSans-Regular.ttf")
@@ -14,30 +15,47 @@ ASSETS_EAGLE_PATH = os.path.join(os.path.dirname(__file__), "assets", "images", 
 def load_font(size, path=ASSETS_FONT_PATH):
     try:
         return pygame.font.Font(path, size)
-    except Exception:
+    except (FileNotFoundError, pygame.error):
         return pygame.font.SysFont("serif", size)
 
 def load_title_font(size):
     try:
         return pygame.font.Font(ASSETS_TITLE_FONT_PATH, size)
-    except Exception:
+    except (FileNotFoundError, pygame.error):
         return pygame.font.SysFont("serif", size, bold=True)
 
 def load_eagle():
     try:
         img = pygame.image.load(ASSETS_EAGLE_PATH)
         return pygame.transform.scale(img, (48, 48))
-    except Exception:
+    except (FileNotFoundError, pygame.error):
         return None
 
 def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img=None):
+    """Display the start menu and handle user input.
+    
+    Args:
+        screen: Pygame display surface
+        font_title: Font for title text
+        font_button: Font for button text
+        title: Game title string
+        desc: Game description string
+        show_resume: Whether to show the resume button
+        eagle_img: Optional eagle icon image
+        
+    Returns:
+        str: "new" for new game or "resume" to resume saved game
+    """
     clock = pygame.time.Clock()
+    frame = 0
     while True:
-        new_rect, resume_rect = draw_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img)
+        frame += 1
+        new_rect, resume_rect = draw_menu(screen, font_title, font_button, title, desc, show_resume, eagle_img, frame)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit(); exit()
+                pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if new_rect.collidepoint(event.pos):
                     return "new"
@@ -51,9 +69,18 @@ def start_menu(screen, font_title, font_button, title, desc, show_resume, eagle_
         clock.tick(30)
 
 def main():
-    pygame.init()
-    pygame.display.set_caption("Aenigma Numerorum Caesaris")
-    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    """Main game loop for Aenigma Numerorum Caesaris (Roman Numeral Sudoku).
+    
+    Initializes pygame, displays the start menu, and runs the game loop with
+    controls for pause, resume, new game, hints, and cell selection/input.
+    """
+    try:
+        pygame.init()
+        pygame.display.set_caption("Aenigma Numerorum Caesaris")
+        screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    except pygame.error as e:
+        print(f"Failed to initialize pygame: {e}")
+        sys.exit(1)
     font_small = load_font(18)
     font_cell = load_font(30)
     font_title = load_title_font(48)  # Large, bold Roman font
@@ -171,7 +198,7 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 x, y = event.pos
                 grid_x0 = MARGIN
-                grid_y0 = TOP_BAR
+                grid_y0 = TOP_BAR + RULES_HEIGHT
                 if grid_x0 <= x <= grid_x0 + 9 * CELL_SIZE and grid_y0 <= y <= grid_y0 + 9 * CELL_SIZE:
                     c = (x - grid_x0) // CELL_SIZE
                     r = (y - grid_y0) // CELL_SIZE
@@ -180,23 +207,25 @@ def main():
 
         # Drawing
         screen.fill(WHITE)
-        # Title and description with laurel, SPQR, eagle
-        draw_animated_laurel(screen, frame)
+        # Title and description with SPQR, eagle
         draw_title(screen, font_title, font_desc, title, desc, eagle_img)
+        # Animated laurel drawn on top of title bar
+        draw_animated_laurel(screen, frame)
         # Elapsed time
         if paused:
             elapsed = int((pause_started - start_time - paused_accum)) if pause_started else int((time.time() - start_time - paused_accum))
         else:
             elapsed = int(time.time() - start_time - paused_accum)
         # Rules and status
-        rules_y = 120
+        rules_y = TOP_BAR
         draw_rules(screen, font_small, elapsed, paused, y_offset=rules_y)
         # Grid and cells
         draw_grid(screen, font_cell, board, selected)
         # Win state
         if board.is_complete():
             msg = "Completed! Press R for a new puzzle or Q to quit."
-            draw_text(screen, msg, font_small, BLACK, (MARGIN, rules_y + 85))
+            win_y = TOP_BAR + RULES_HEIGHT + 9 * CELL_SIZE + 10
+            draw_text(screen, msg, font_small, BLACK, (MARGIN, win_y))
         pygame.display.flip()
 
     pygame.quit()
