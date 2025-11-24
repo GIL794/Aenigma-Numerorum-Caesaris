@@ -6,6 +6,7 @@ ROMAN_TO_INT_MAP = {
 INT_TO_ROMAN_MAP = {v: k for k, v in ROMAN_TO_INT_MAP.items()}
 
 VALID_ROMAN_TOKENS = set(ROMAN_TO_INT_MAP.keys())
+ROMAN_CHARS = ["I", "V", "X"]
 
 def int_to_roman(n: int) -> str:
     if n not in INT_TO_ROMAN_MAP:
@@ -24,7 +25,7 @@ def normalize_roman_input(buffer: str) -> str:
     if s in VALID_ROMAN_TOKENS:
         # Check if this could be a prefix of a longer valid Roman numeral
         # Don't auto-commit if adding I, V, or X could form a valid longer numeral
-        for next_char in ["I", "V", "X"]:
+        for next_char in ROMAN_CHARS:
             potential = s + next_char
             if potential in VALID_ROMAN_TOKENS:
                 return ""  # Don't commit yet, could be longer
