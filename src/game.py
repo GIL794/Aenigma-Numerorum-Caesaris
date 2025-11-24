@@ -192,7 +192,17 @@ def main():
                                         board.set_cell(r, c, val)
                                 roman_buffer = ""  # reset after commit
                         else:
-                            # Any other key resets buffer
+                            # Any other key: try to commit buffer first, then reset
+                            if roman_buffer and selected:
+                                # Try to commit the partial buffer as-is if it's valid
+                                if roman_buffer.upper() in ("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"):
+                                    try:
+                                        val = roman_to_int(roman_buffer)
+                                        r, c = selected
+                                        if not board.fixed[r][c]:
+                                            board.set_cell(r, c, val)
+                                    except Exception:
+                                        pass
                             roman_buffer = ""
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
